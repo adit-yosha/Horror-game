@@ -3,37 +3,31 @@ using UnityEngine.Rendering.Universal;
 
 public class Flashlight : MonoBehaviour
 {
-    public Light2D flashlight;
+    public Light2D light2D;
     public PlayerMovement player;
 
-    public float distance = 0.4f;
-
-    void Start()
-    {
-        if (flashlight == null)
-            flashlight = GetComponent<Light2D>();
-
-        flashlight.enabled = false;
-    }
+    public float distance = 0.5f;
 
     void Update()
     {
-        if (player == null) return;
+        if (player == null || light2D == null) return;
 
         Vector2 dir = player.LastDirection;
 
-        if (dir != Vector2.zero)
-        {
-            transform.localPosition = dir.normalized * distance;
+        // Kalau player lagi diam, jangan ubah arah
+        if (dir.magnitude < 0.1f) return;
 
-            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-            transform.localRotation = Quaternion.Euler(0, 0, angle - 90f);
-        }
+        // 🔥 POSISI di depan player
+        transform.localPosition = dir.normalized * distance;
+
+        // 🔥 ROTASI mengikuti arah
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        transform.localRotation = Quaternion.Euler(0, 0, angle);
     }
 
-    // 🔥 DIPANGGIL DARI BUTTON
+    // 🔥 ON / OFF flashlight
     public void ToggleFlashlight()
     {
-        flashlight.enabled = !flashlight.enabled;
+        light2D.enabled = !light2D.enabled;
     }
 }
