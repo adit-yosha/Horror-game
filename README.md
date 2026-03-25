@@ -7,4 +7,6 @@ Next:
 - Enemy Ai
 
 Status:
-Masih dalam tahap pengembangan awal (early prototype).
+-Masih dalam tahap pengembangan awal (early prototype).
+
+NOICE
