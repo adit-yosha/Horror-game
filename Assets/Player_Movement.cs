@@ -17,10 +17,20 @@ public class PlayerMovement : MonoBehaviour
     // 🔥 SIMPAN ARAH TERAKHIR
     public Vector2 LastDirection { get; private set; } = Vector2.down;
 
+    // =====================
+    // 🔥 TAMBAHAN DEATH SYSTEM
+    // =====================
+    public Transform spawnPoint;
+    private bool isDead = false;
+
+    // 🔥 TAMBAHAN
+    private Collider2D col;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        col = GetComponent<Collider2D>(); // 🔥 ambil collider
 
         rb.gravityScale = 0;
         rb.freezeRotation = true;
@@ -31,7 +41,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        if (isFrozen)
+        if (isFrozen || isDead)
         {
             input = Vector2.zero;
             UpdateAnimator();
@@ -51,7 +61,7 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (isFrozen) return;
+        if (isFrozen || isDead) return;
 
         rb.MovePosition(rb.position + input * speed * Time.fixedDeltaTime);
     }
@@ -127,5 +137,43 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitForSeconds(duration);
 
         isFrozen = false;
+    }
+
+    // =====================
+    // 🔥 DETECT ENEMY
+    // =====================
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Ghost") && !isDead)
+        {
+            StartCoroutine(DieAndRespawn());
+        }
+    }
+
+    // =====================
+    // 💀 DIE + RESPAWN
+    // =====================
+    private IEnumerator DieAndRespawn()
+    {
+        isDead = true;
+
+        // 🔥 MATIKAN COLLIDER (ANTI NYENTUH TERUS)
+        col.enabled = false;
+
+        // stop gerak
+        rb.velocity = Vector2.zero;
+
+        // freeze dikit biar dramatis
+        yield return new WaitForSeconds(0.5f);
+
+        // pindah ke spawn
+        transform.position = spawnPoint.position;
+
+        yield return new WaitForSeconds(0.3f);
+
+        // 🔥 HIDUPKAN LAGI COLLIDER
+        col.enabled = true;
+
+        isDead = false;
     }
 }

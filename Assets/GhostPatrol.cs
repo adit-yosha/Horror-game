@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GhostPatrol : MonoBehaviour
 {
@@ -17,6 +17,9 @@ public class GhostPatrol : MonoBehaviour
     Transform player;
     Rigidbody2D rb;
 
+    // 🔥 TAMBAHAN
+    bool isTouchingPlayer = false;
+
     void Start()
     {
         waitCounter = waitTime;
@@ -30,6 +33,9 @@ public class GhostPatrol : MonoBehaviour
     void FixedUpdate()
     {
         if (player == null || patrolPoints.Length == 0) return;
+
+        // 🔥 STOP kalau lagi nyentuh player
+        if (isTouchingPlayer) return;
 
         Vector2 origin = rb.position;
         Vector2 target = player.position;
@@ -72,7 +78,7 @@ public class GhostPatrol : MonoBehaviour
                     currentPoint++;
 
                     if (currentPoint >= patrolPoints.Length)
-                        currentPoint = 0;   // RESET ke awal
+                        currentPoint = 0;
 
                     waitCounter = waitTime;
                 }
@@ -84,5 +90,24 @@ public class GhostPatrol : MonoBehaviour
         }
 
         Debug.DrawLine(origin, target, Color.red);
+    }
+
+    // =====================
+    // 🔥 DETECT PLAYER
+    // =====================
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            isTouchingPlayer = true;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            isTouchingPlayer = false;
+        }
     }
 }
