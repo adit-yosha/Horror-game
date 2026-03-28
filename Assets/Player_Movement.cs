@@ -30,7 +30,7 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        col = GetComponent<Collider2D>(); // 🔥 ambil collider
+        col = GetComponent<Collider2D>();
 
         rb.gravityScale = 0;
         rb.freezeRotation = true;
@@ -140,35 +140,38 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // =====================
-    // 🔥 DETECT ENEMY
+    // 🔥 DETECT ENEMY (FIX)
     // =====================
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        Debug.Log("Kena: " + collision.name); // 🔥 DEBUG
+
         if (collision.CompareTag("Ghost") && !isDead)
         {
+            isDead = true; // 🔥 PINDAH KE SINI (ANTI DOUBLE TRIGGER)
             StartCoroutine(DieAndRespawn());
         }
     }
 
     // =====================
-    // 💀 DIE + RESPAWN
+    // 💀 DIE + RESPAWN (FIX)
     // =====================
     private IEnumerator DieAndRespawn()
     {
-        isDead = true;
-
         // 🔥 MATIKAN COLLIDER (ANTI NYENTUH TERUS)
         col.enabled = false;
 
-        // stop gerak
+        // stop gerak total
         rb.velocity = Vector2.zero;
+        rb.angularVelocity = 0f;
 
-        // freeze dikit biar dramatis
+        // delay biar ada efek mati
         yield return new WaitForSeconds(0.5f);
 
         // pindah ke spawn
         transform.position = spawnPoint.position;
 
+        // kasih waktu aman
         yield return new WaitForSeconds(0.3f);
 
         // 🔥 HIDUPKAN LAGI COLLIDER

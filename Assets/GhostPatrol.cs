@@ -17,9 +17,6 @@ public class GhostPatrol : MonoBehaviour
     Transform player;
     Rigidbody2D rb;
 
-    // 🔥 TAMBAHAN
-    bool isTouchingPlayer = false;
-
     void Start()
     {
         waitCounter = waitTime;
@@ -33,9 +30,6 @@ public class GhostPatrol : MonoBehaviour
     void FixedUpdate()
     {
         if (player == null || patrolPoints.Length == 0) return;
-
-        // 🔥 STOP kalau lagi nyentuh player
-        if (isTouchingPlayer) return;
 
         Vector2 origin = rb.position;
         Vector2 target = player.position;
@@ -55,8 +49,13 @@ public class GhostPatrol : MonoBehaviour
         if (canSeePlayer)
         {
             // ===== CHASE PLAYER =====
-            Vector2 dir = (target - origin).normalized;
-            rb.MovePosition(origin + dir * chaseSpeed * Time.fixedDeltaTime);
+
+            // 🔥 STOP sedikit sebelum nabrak (biar ga nyatu)
+            if (distanceToPlayer > 0.3f)
+            {
+                Vector2 dir = (target - origin).normalized;
+                rb.MovePosition(origin + dir * chaseSpeed * Time.fixedDeltaTime);
+            }
         }
         else
         {
@@ -93,21 +92,13 @@ public class GhostPatrol : MonoBehaviour
     }
 
     // =====================
-    // 🔥 DETECT PLAYER
+    // 🔥 DETECT PLAYER (DEBUG)
     // =====================
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
         {
-            isTouchingPlayer = true;
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Player"))
-        {
-            isTouchingPlayer = false;
+            Debug.Log("Ghost kena Player!");
         }
     }
 }
