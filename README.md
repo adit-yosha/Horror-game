@@ -13,5 +13,4 @@ Status:
 
 NOICE
 
-Nambahin item 
-testing
+Besok aja dah ngoding nya💀'
